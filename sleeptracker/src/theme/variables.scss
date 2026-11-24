@@ -1,2 +1,80 @@
 // For information on how to create your own theme, please see:
 // http://ionicframework.com/docs/theming/
+//
+// Sleep Tracker theme: a calm "night sky" palette. The app is always dark because people
+// use it right before bed and right after waking up, when a bright white screen is harsh.
+// A small set of colors: lavender (primary actions), soft teal (secondary), warm amber (warnings).
+
+:root,
+:root.ios,
+:root.md {
+  /* Primary: lavender */
+  --ion-color-primary: #9b8cff;
+  --ion-color-primary-rgb: 155, 140, 255;
+  --ion-color-primary-contrast: #11132b;
+  --ion-color-primary-contrast-rgb: 17, 19, 43;
+  --ion-color-primary-shade: #887be0;
+  --ion-color-primary-tint: #a598ff;
+
+  /* Secondary: soft teal */
+  --ion-color-secondary: #5ed3c7;
+  --ion-color-secondary-rgb: 94, 211, 199;
+  --ion-color-secondary-contrast: #11132b;
+  --ion-color-secondary-contrast-rgb: 17, 19, 43;
+  --ion-color-secondary-shade: #53baaf;
+  --ion-color-secondary-tint: #6ed7cd;
+
+  /* Warning: warm amber */
+  --ion-color-warning: #f6b26b;
+  --ion-color-warning-rgb: 246, 178, 107;
+  --ion-color-warning-contrast: #11132b;
+  --ion-color-warning-contrast-rgb: 17, 19, 43;
+  --ion-color-warning-shade: #d89d5e;
+  --ion-color-warning-tint: #f7ba7a;
+
+  /* Danger: soft coral (readable on dark, not alarming) */
+  --ion-color-danger: #ff7a85;
+  --ion-color-danger-rgb: 255, 122, 133;
+  --ion-color-danger-contrast: #11132b;
+  --ion-color-danger-contrast-rgb: 17, 19, 43;
+  --ion-color-danger-shade: #e06b75;
+  --ion-color-danger-tint: #ff8791;
+
+  /* Medium: muted text */
+  --ion-color-medium: #9a9cc0;
+  --ion-color-medium-rgb: 154, 156, 192;
+  --ion-color-medium-contrast: #11132b;
+  --ion-color-medium-contrast-rgb: 17, 19, 43;
+  --ion-color-medium-shade: #8789a9;
+  --ion-color-medium-tint: #a4a6c6;
+
+  /* Surfaces */
+  --ion-background-color: #0d1026;
+  --ion-background-color-rgb: 13, 16, 38;
+  --ion-text-color: #eceaff;
+  --ion-text-color-rgb: 236, 234, 255;
+  --ion-card-background: #171b3a;
+  --ion-item-background: #171b3a;
+  --ion-toolbar-background: #0d1026;
+  --ion-tab-bar-background: #11142e;
+  --ion-tab-bar-color: #8a8cb3;
+  --ion-tab-bar-color-selected: var(--ion-color-primary);
+  --ion-border-color: #2a2f5a;
+  --ion-item-border-color: #2a2f5a;
+  --ion-color-step-50: #151937;
+  --ion-color-step-100: #1c2042;
+  --ion-color-step-150: #22274c;
+  --ion-color-step-200: #292e56;
+  --ion-background-color-step-50: #151937;
+  --ion-background-color-step-100: #1c2042;
+  --ion-background-color-step-150: #22274c;
+  --ion-background-color-step-200: #292e56;
+
+  --ion-font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Modals/pickers use their own background variable in iOS dark mode */
+:root.ios ion-modal {
+  --ion-background-color: #171b3a;
+  --ion-toolbar-background: #171b3a;
+}

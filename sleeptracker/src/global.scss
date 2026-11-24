@@ -34,4 +34,208 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+/* The app is always dark (see theme/variables.scss for why). */
+@import '@ionic/angular/css/palettes/dark.always.css';
+
+
+/* ----------------------------------------------------------------------------
+ * Sleep Tracker shared styles (used on more than one page)
+ * ------------------------------------------------------------------------- */
+
+ion-card {
+  border-radius: 18px;
+  margin-bottom: 18px;
+}
+
+ion-card-title {
+  font-weight: 700;
+}
+
+.muted {
+  color: var(--ion-color-medium);
+}
+
+.center {
+  text-align: center;
+}
+
+.small-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.stat-row {
+  display: flex;
+  gap: 32px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.stat-value {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+.form-list {
+  background: transparent;
+  margin: 0 0 8px;
+
+  ion-label {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    margin-right: 8px;
+  }
+}
+
+/* Date/time buttons: tinted so they clearly look tappable */
+ion-datetime-button::part(native) {
+  background: rgba(var(--ion-color-primary-rgb), 0.16);
+  color: var(--ion-color-primary-tint);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 6px 10px;
+}
+
+.field-label {
+  font-weight: 600;
+  margin: 18px 0 8px;
+  color: var(--ion-text-color);
+}
+
+.form-message {
+  margin: 4px 0 8px;
+  font-weight: 500;
+}
+
+.note-field {
+  margin-top: 16px;
+}
+
+.save-button {
+  margin-top: 20px;
+  --border-radius: 14px;
+  font-weight: 700;
+}
+
+.chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+/* Sleep quality picker (large touch targets, 44pt+ per iOS guidelines) */
+.quality-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.quality-option {
+  flex: 1;
+  min-height: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 14px;
+  background: transparent;
+  color: var(--ion-color-medium);
+  font: inherit;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+
+  .emoji {
+    font-size: 1.6rem;
+  }
+
+  .quality-label {
+    font-size: 0.7rem;
+  }
+
+  &.selected {
+    border-color: var(--ion-color-primary);
+    background: rgba(var(--ion-color-primary-rgb), 0.18);
+    color: var(--ion-text-color);
+  }
+}
+
+/* Stanford Sleepiness Scale badges: calm teal (alert) to deep violet (asleep) */
+.sss-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-weight: 800;
+  color: #11132b;
+  flex-shrink: 0;
+
+  &.small {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+  }
+}
+
+.sss-1 { background: #5ed3c7; }
+.sss-2 { background: #7fd6a8; }
+.sss-3 { background: #c4dc8a; }
+.sss-4 { background: #f6d27a; }
+.sss-5 { background: #f6b26b; }
+.sss-6 { background: #ee8fa6; }
+.sss-7 { background: #b79cff; }
+
+/* Empty states */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 64px 32px;
+
+  > ion-icon {
+    font-size: 64px;
+    color: var(--ion-color-primary);
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  p {
+    color: var(--ion-color-medium);
+    margin-bottom: 20px;
+  }
+}
+
+ion-item-divider {
+  --background: var(--ion-background-color);
+  --color: var(--ion-color-medium);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+}
+
+.app-toast {
+  --background: #2a2f5a;
+  --color: #eceaff;
+  --button-color: var(--ion-color-primary);
+  font-weight: 500;
+}

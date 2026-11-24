@@ -1,0 +1,137 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Sleep</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Sleep</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Useful initial view: how last night went, at a glance -->
+  <ion-card class="summary-card">
+    <ion-card-header>
+      <ion-card-subtitle>{{ greeting }}</ion-card-subtitle>
+      @if (sleep.lastNight(); as last) {
+        <ion-card-title class="big-number">{{ last.durationString() }}</ion-card-title>
+      } @else {
+        <ion-card-title>No nights logged yet</ion-card-title>
+      }
+    </ion-card-header>
+    <ion-card-content class="summary-content">
+      @if (sleep.lastNight(); as last) {
+        <p class="muted">Last logged night · {{ last.timeRangeString() }}</p>
+      } @else {
+        <p class="muted">Log last night below, or start bedtime mode tonight.</p>
+      }
+    </ion-card-content>
+    @if (sleep.weekAverageMs(); as avg) {
+      <ion-card-content class="stat-row">
+        <div>
+          <span class="stat-label">7-day average</span>
+          <span class="stat-value">{{ formatDuration(avg) }}</span>
+        </div>
+        <div>
+          <span class="stat-label">Goal</span>
+          <span class="stat-value">7–9h</span>
+        </div>
+      </ion-card-content>
+    }
+  </ion-card>
+
+  <!-- Bedtime mode -->
+  <ion-card class="bedtime-card">
+    <ion-card-content>
+      @if (sleep.activeSleepStart(); as start) {
+        <div class="bedtime-status">
+          <ion-icon name="moon" color="primary" aria-hidden="true"></ion-icon>
+          <div>
+            <strong>Sleeping since {{ formatTime(start) }}</strong>
+            <p class="muted">{{ formatDuration(now().getTime() - start.getTime()) }} so far</p>
+          </div>
+        </div>
+        <ion-button expand="block" size="large" (click)="wakeUp()">
+          <ion-icon slot="start" name="sunny-outline" aria-hidden="true"></ion-icon>
+          I'm awake
+        </ion-button>
+        <ion-button expand="block" fill="clear" color="medium" size="small" (click)="cancelBedtime()">
+          Cancel bedtime
+        </ion-button>
+      } @else {
+        <ion-button expand="block" size="large" (click)="goToBed()">
+          <ion-icon slot="start" name="bed-outline" aria-hidden="true"></ion-icon>
+          I'm going to bed
+        </ion-button>
+        <p class="muted center">Tap at bedtime, then "I'm awake" in the morning. No typing needed.</p>
+      }
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Log a night (manual or reviewing bedtime mode) -->
+  <ion-card #logCard [class.highlight]="fromBedtimeMode">
+    <ion-card-header>
+      <ion-card-title>{{ fromBedtimeMode ? 'Review & save your night' : 'Log a night' }}</ion-card-title>
+      <ion-card-subtitle>{{ fromBedtimeMode ? 'Adjust anything that looks off' : 'Times are pre-filled. Just adjust them.' }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-list lines="full" class="form-list">
+      <ion-item>
+        <ion-icon slot="start" name="moon-outline" color="primary" aria-hidden="true"></ion-icon>
+        <ion-label>Went to bed</ion-label>
+        <ion-datetime-button slot="end" datetime="bedtimePicker"></ion-datetime-button>
+      </ion-item>
+      <ion-item>
+        <ion-icon slot="start" name="sunny-outline" color="warning" aria-hidden="true"></ion-icon>
+        <ion-label>Woke up</ion-label>
+        <ion-datetime-button slot="end" datetime="wakePicker"></ion-datetime-button>
+      </ion-item>
+    </ion-list>
+
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime id="bedtimePicker" presentation="date-time" [preferWheel]="true" [showDefaultButtons]="true" minuteValues="0,5,10,15,20,25,30,35,40,45,50,55"
+          [value]="bedISO" [max]="maxISO" (ionChange)="setBed($event.detail.value)"></ion-datetime>
+      </ng-template>
+    </ion-modal>
+    <ion-modal [keepContentsMounted]="true">
+      <ng-template>
+        <ion-datetime id="wakePicker" presentation="date-time" [preferWheel]="true" [showDefaultButtons]="true" minuteValues="0,5,10,15,20,25,30,35,40,45,50,55"
+          [value]="wakeISO" [max]="maxISO" (ionChange)="setWake($event.detail.value)"></ion-datetime>
+      </ng-template>
+    </ion-modal>
+
+    <ion-card-content>
+      <!-- Live result + error prevention -->
+      @if (formError; as error) {
+        <ion-text color="danger"><p class="form-message" role="alert">{{ error }}</p></ion-text>
+      } @else {
+        <p class="duration-preview"><strong>{{ formatDuration(formDurationMs) }}</strong> of sleep</p>
+        @if (formWarning; as warning) {
+          <ion-text color="warning"><p class="form-message">{{ warning }}</p></ion-text>
+        }
+      }
+
+      <p class="field-label">How did you sleep? <span class="muted">(optional)</span></p>
+      <div class="quality-row" role="radiogroup" aria-label="Sleep quality">
+        @for (option of qualityOptions; track option.value) {
+          <button type="button" class="quality-option" role="radio" [attr.aria-checked]="quality === option.value"
+            [class.selected]="quality === option.value" (click)="selectQuality(option.value)">
+            <span class="emoji" aria-hidden="true">{{ option.emoji }}</span>
+            <span class="quality-label">{{ option.label }}</span>
+          </button>
+        }
+      </div>
+
+      <ion-textarea class="note-field" fill="outline" label="Note (optional)" labelPlacement="floating" [autoGrow]="true"
+        [maxlength]="200" [counter]="note.length > 150" placeholder="Late study session, caffeine, stress…"
+        [(ngModel)]="note"></ion-textarea>
+
+      <ion-button expand="block" size="large" class="save-button" [disabled]="!!formError" (click)="save()">
+        Save night
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

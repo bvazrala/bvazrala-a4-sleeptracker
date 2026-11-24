@@ -1,0 +1,134 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Sleepiness</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Sleepiness</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>How sleepy do you feel?</ion-card-title>
+      <ion-card-subtitle>Stanford Sleepiness Scale · tap the one that fits best</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-list lines="none" class="scale-list" role="radiogroup" aria-label="Stanford Sleepiness Scale">
+      @for (level of scale; track level.value) {
+        <ion-item button [detail]="false" class="scale-item" [class.selected]="selected === level.value"
+          role="radio" [attr.aria-checked]="selected === level.value" (click)="select(level.value)">
+          <span slot="start" class="sss-badge sss-{{ level.value }}">{{ level.value }}</span>
+          <ion-label class="ion-text-wrap">
+            <h3>{{ level.short }}</h3>
+            <p>{{ level.full }}</p>
+          </ion-label>
+          @if (selected === level.value) {
+            <ion-icon slot="end" name="checkmark-circle" color="primary" aria-hidden="true"></ion-icon>
+          }
+        </ion-item>
+      }
+    </ion-list>
+
+    <ion-card-content>
+      <ion-list lines="full" class="form-list">
+        <ion-item>
+          <ion-icon slot="start" name="time-outline" color="medium" aria-hidden="true"></ion-icon>
+          <ion-label>When</ion-label>
+          <ion-datetime-button slot="end" datetime="sleepinessTimePicker"></ion-datetime-button>
+        </ion-item>
+      </ion-list>
+      <ion-modal [keepContentsMounted]="true">
+        <ng-template>
+          <ion-datetime id="sleepinessTimePicker" presentation="date-time" [preferWheel]="true" [showDefaultButtons]="true"
+            [value]="whenISO" [max]="maxISO" (ionChange)="setWhen($event.detail.value)"></ion-datetime>
+        </ng-template>
+      </ion-modal>
+
+      <p class="field-label">What's going on? <span class="muted">(optional)</span></p>
+      <div class="chip-row">
+        @for (tag of tagOptions; track tag) {
+          <ion-chip [outline]="!tags.includes(tag)" [color]="tags.includes(tag) ? 'primary' : 'medium'"
+            (click)="toggleTag(tag)" [attr.aria-pressed]="tags.includes(tag)">
+            <ion-label>{{ tag }}</ion-label>
+          </ion-chip>
+        }
+      </div>
+
+      <ion-textarea class="note-field" fill="outline" label="Note (optional)" labelPlacement="floating" [autoGrow]="true"
+        [maxlength]="200" [(ngModel)]="note"></ion-textarea>
+
+      <ion-button expand="block" size="large" class="save-button" [disabled]="selected === null" (click)="save()">
+        {{ selected === null ? 'Pick a level above' : 'Log sleepiness: ' + selected }}
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Immediate feedback: today's check-ins -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Today's check-ins</ion-card-title>
+    </ion-card-header>
+    @if (sleep.todaysSleepiness().length) {
+      <ion-list lines="inset">
+        @for (entry of sleep.todaysSleepiness(); track entry.id) {
+          <ion-item>
+            <span slot="start" class="sss-badge small sss-{{ entry.loggedValue }}">{{ entry.loggedValue }}</span>
+            <ion-label>
+              <h3>{{ entry.shortLabel() }}</h3>
+              <p>{{ formatTime(entry.loggedAt) }}{{ entry.tags.length ? ' · ' + entry.tags.join(', ') : '' }}</p>
+            </ion-label>
+          </ion-item>
+        }
+      </ion-list>
+    } @else {
+      <ion-card-content><p class="muted">No check-ins yet today.</p></ion-card-content>
+    }
+  </ion-card>
+
+  <!-- Native device resource: local notifications -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Check-in reminders</ion-card-title>
+      <ion-card-subtitle>We'll nudge you so you don't have to remember</ion-card-subtitle>
+    </ion-card-header>
+    <ion-list lines="full">
+      <ion-item>
+        <ion-icon slot="start" name="notifications-outline" color="primary" aria-hidden="true"></ion-icon>
+        <ion-toggle [checked]="reminders.settings().enabled" (ionChange)="onRemindersToggle($event)">
+          Remind me during the day
+        </ion-toggle>
+      </ion-item>
+    </ion-list>
+    <ion-card-content>
+      @if (reminders.settings().enabled) {
+        <p class="field-label">Remind me at</p>
+        <div class="chip-row">
+          @for (hour of reminderHours; track hour) {
+            <ion-chip [outline]="!reminders.settings().hours.includes(hour)"
+              [color]="reminders.settings().hours.includes(hour) ? 'primary' : 'medium'" (click)="toggleHour(hour)"
+              [attr.aria-pressed]="reminders.settings().hours.includes(hour)">
+              <ion-label>{{ hourLabel(hour) }}</ion-label>
+            </ion-chip>
+          }
+        </div>
+        @if (reminders.settings().hours.length === 0) {
+          <ion-text color="warning"><p class="form-message">Pick at least one time.</p></ion-text>
+        }
+      }
+      @if (reminders.permission() === 'denied') {
+        <ion-note color="danger">Notifications are blocked. Allow them in your browser or phone settings.</ion-note>
+      }
+      @if (reminders.permission() === 'unsupported') {
+        <ion-note>This browser doesn't support notifications.</ion-note>
+      }
+      <ion-button expand="block" fill="outline" (click)="testReminder()">
+        <ion-icon slot="start" name="alarm-outline" aria-hidden="true"></ion-icon>
+        Send a test reminder (5 sec)
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

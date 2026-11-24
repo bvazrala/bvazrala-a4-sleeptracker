@@ -1,0 +1,43 @@
+.summary-card .big-number {
+  font-size: 2.6rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.summary-content {
+  padding-top: 0;
+  padding-bottom: 4px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.bedtime-status {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  ion-icon {
+    font-size: 28px;
+  }
+
+  p {
+    margin: 2px 0 0;
+  }
+}
+
+ion-card.highlight {
+  box-shadow: 0 0 0 2px var(--ion-color-primary);
+}
+
+.duration-preview {
+  font-size: 1.1rem;
+  margin: 4px 0 12px;
+
+  strong {
+    color: var(--ion-color-primary);
+    font-size: 1.4rem;
+  }
+}

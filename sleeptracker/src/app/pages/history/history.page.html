@@ -1,0 +1,119 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>History</ion-title>
+    @if (sleep.allSleepData().length) {
+      <ion-buttons slot="end">
+        <ion-button color="danger" (click)="clearAll()" aria-label="Delete all data">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    }
+  </ion-toolbar>
+  <ion-toolbar>
+    <ion-segment [value]="filter()" (ionChange)="setFilter($event.detail.value)">
+      <ion-segment-button value="all"><ion-label>All</ion-label></ion-segment-button>
+      <ion-segment-button value="sleep"><ion-label>Sleep</ion-label></ion-segment-button>
+      <ion-segment-button value="sleepiness"><ion-label>Sleepiness</ion-label></ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  @if (sleep.allSleepData().length === 0) {
+    <!-- Empty state: tell the person what to do next -->
+    <div class="empty-state">
+      <ion-icon name="moon-outline" aria-hidden="true"></ion-icon>
+      <h2>Nothing logged yet</h2>
+      <p>Your nights and sleepiness check-ins will show up here.</p>
+      <ion-button routerLink="/tabs/sleep">Log last night</ion-button>
+      <ion-button fill="clear" size="small" (click)="loadSample()">
+        <ion-icon slot="start" name="sparkles-outline" aria-hidden="true"></ion-icon>
+        Explore with a sample week
+      </ion-button>
+    </div>
+  } @else {
+    @if (filter() !== 'sleepiness') {
+      <ion-card>
+        <ion-card-header>
+          <ion-card-subtitle>Last 7 nights · dashed line = 8h</ion-card-subtitle>
+          <ion-card-title>
+            @if (sleep.weekAverageMs(); as avg) { {{ formatDuration(avg) }} average } @else { No nights this week }
+          </ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="chart" role="img" aria-label="Hours slept for each of the last 7 nights">
+            @for (bar of sleep.last7Nights(); track bar.date.getTime()) {
+              <div class="bar-column" [class.today]="bar.isToday">
+                <span class="bar-value">{{ bar.hours !== null ? bar.hours.toFixed(1) : '–' }}</span>
+                <div class="bar-track">
+                  <div class="goal-tick" [style.bottom]="goalLinePosition()"></div>
+                  <div class="bar" [class.short]="bar.hours !== null && bar.hours < 7" [style.height]="barHeight(bar.hours)"></div>
+                </div>
+                <span class="bar-label">{{ bar.label }}</span>
+              </div>
+            }
+          </div>
+        </ion-card-content>
+      </ion-card>
+    }
+
+    @if (filter() !== 'sleep') {
+      <ion-card>
+        <ion-card-header>
+          <ion-card-subtitle>Sleepiness · last 7 days</ion-card-subtitle>
+          <ion-card-title>
+            @if (sleep.sleepinessWeekAverage(); as avg) {
+              {{ avg.toFixed(1) }} average <span class="muted small-text">({{ sleepinessLabels[roundValue(avg)] }})</span>
+            } @else { No check-ins this week }
+          </ion-card-title>
+        </ion-card-header>
+      </ion-card>
+    }
+
+    @for (group of groups(); track group.label) {
+      <ion-item-group>
+        <ion-item-divider sticky>
+          <ion-label>{{ group.label }}</ion-label>
+        </ion-item-divider>
+
+        @for (entry of group.entries; track entry.id) {
+          <ion-item-sliding #slidingItem>
+            <ion-item button [detail]="false" (click)="openEntry(entry)">
+              @if (asNight(entry); as night) {
+                <ion-icon slot="start" name="moon" color="primary" aria-hidden="true"></ion-icon>
+                <ion-label class="ion-text-wrap">
+                  <h3>{{ night.durationString() }} of sleep</h3>
+                  <p>{{ night.timeRangeString() }}</p>
+                  @if (night.note) { <p class="note">“{{ night.note }}”</p> }
+                </ion-label>
+                @if (night.quality) {
+                  <span slot="end" class="quality-badge" [attr.aria-label]="'Quality: ' + qualityLabels[night.quality]">
+                    {{ qualityEmoji[night.quality] }}
+                  </span>
+                }
+              }
+              @if (asSleepiness(entry); as s) {
+                <span slot="start" class="sss-badge small sss-{{ s.loggedValue }}">{{ s.loggedValue }}</span>
+                <ion-label class="ion-text-wrap">
+                  <h3>{{ s.shortLabel() }}</h3>
+                  <p>{{ formatTime(s.loggedAt) }}{{ s.tags.length ? ' · ' + s.tags.join(', ') : '' }}</p>
+                  @if (s.note) { <p class="note">“{{ s.note }}”</p> }
+                </ion-label>
+              }
+            </ion-item>
+            <ion-item-options side="end">
+              <ion-item-option color="danger" (click)="delete(entry, slidingItem)">
+                <ion-icon slot="icon-only" name="trash-outline" aria-label="Delete"></ion-icon>
+              </ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        }
+      </ion-item-group>
+    }
+
+    @if (groups().length === 0) {
+      <p class="muted center ion-padding">Nothing in this category yet.</p>
+    }
+    <p class="muted center hint">Tip: swipe an entry left (or tap it) to delete it.</p>
+  }
+</ion-content>
