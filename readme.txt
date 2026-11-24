@@ -84,9 +84,5 @@ Every add, delete, replace, and undo is saved immediately with Capacitor Prefere
 Useful initial view: the app opens on the Sleep tab showing last night's duration, the 7-day average, and a one-tap "I'm going to bed" button; empty states explain what to do next. Uh-oh button: every save, delete, "clear all", and bedtime action shows a toast with Undo. Error prevention: times are pre-filled and can't be in the future, invalid nights disable Save with a clear message, pickers need Done to commit, duplicate nights ask to replace, and "Delete all" requires confirmation. Platform conventions: iOS tab bar, large titles, wheel pickers, swipe-to-delete, action sheets, 44pt+ touch targets, and a consistent dark "night" color theme (edited Ionic global variables) that is easy on the eyes at bedtime.
 
 
-Demo video timestamps (fill in after recording):
-- Log overnight sleep: 0:00
-- Log sleepiness: 0:**
-- View logged data (History): 0:**
-- Data backup (browser reload): 0:**
-- Native resource (reminder notification): 0:**
+Demo video: demo.mp4
+
